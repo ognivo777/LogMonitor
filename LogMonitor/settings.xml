@@ -1,0 +1,48 @@
+<settings>
+
+    <!-- SSH tunnel defenition-->
+    <tunnel name="SSHTUN" host="123.123.123.123" user="guest" password="pass" port="22">
+        <L localPort="30022" destHost="122.168.1.15" destPort="22" />
+    </tunnel>
+
+    <!-- connect using SSH tunnel -->
+    <server name="SSH Server under SSH tunnel" host="127.0.0.1" user="dev" password="dev" port="2622" encoding="utf-8" tunnel="SSHTUN">
+        <log name="Log" file="/var/myLog.log"/>
+    </server>
+
+
+    <!-- Simple connect -->
+    <server name="Simple SSH Server" host="example.com" user="andrew" port="22" password="123" encoding="utf-8">
+        <log name="Log" file="/var/myLog.log"/>
+    </server>
+
+    <server name="SSH Server with .pem authorization" host="example.com" user="root" port="22" pem="./user.pem" encoding="utf-8">
+        <log name="SystemOut" file="~/SystemOut.log" blockPattern="\[\d\d\/\d\d/\d\d \d\d?:\d\d?:\d\d?:\d{1,3}\]"/>
+        <log name="ErrorOut" file="~/ErrorOut.log"/>
+    </server>
+
+    <server serverType="FTP" name="simple FTP" host="example.com" port="21" user="anonymous" password="1">
+        <log name="acces.log" file="/log/access.log"/>
+        <log name="error.log" file="/log/error.log"/>
+    </server>
+
+    <server serverType="SMB" name="SMB" host="10.15.1.22" port="" user="smbUser" password="smbPassword">
+        <log name="log" file="Share/2016.02.12_03.17.12.756.log"/>
+        <log name="log2" file="Share/2.log"/>
+    </server>
+
+
+    <!-- Proxy -->
+    <server name="Server1" host="example.com" user="root" port="22" proxyHost="proxy.server.com" proxyPort="3128" proxyType="HTTP" encoding="utf-8">
+        <log name="log" file="~/log.log"/>
+    </server>
+    <server name="Server1" host="example.com" user="root" port="22" proxyHost="proxy.server.com" proxyPort="1080" proxyType="SOCKS4" encoding="utf-8">
+        <log name="log" file="~/log.log"/>
+    </server>
+    <server name="Server1" host="example.com" user="root" port="22" proxyHost="proxy.server.com" proxyPort="1080" proxyType="SOCKS5" encoding="utf-8">
+        <log name="log" file="~/log.log"/>
+    </server>
+
+
+
+</settings>
