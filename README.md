@@ -7,8 +7,8 @@ It allows you to view continiuosly writed logs in comfortable manner. You able t
 * swich between long/wrapped lines ( <W> key)
 * fast search/count
 * clear screen ( <С> key) for see only new records (all records still availble with <F5> key)
-* open single multiline log event in separate window ( <mouse doble click> )
-* open popup with current log window content ("log snapshot" by <P> key )
+* open single multiline log event in separate window ( < mouse doble click > )
+* open popup with current log window content ( by < P > key )
 * download full log file from remote server (in compresed file if possible)
   
   
