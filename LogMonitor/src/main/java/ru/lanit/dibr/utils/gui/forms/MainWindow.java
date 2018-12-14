@@ -171,6 +171,10 @@ public class MainWindow {
                         lp = new LogPanel(new FtpSource((FTPHost) host, logFile), logFile.getBlockPattern());
                     } else if (host instanceof CIFSHost) {
                         lp = new LogPanel(new CIFSSource((CIFSHost) host, logFile), logFile.getBlockPattern());
+                    } else if (host instanceof PegaHost) {
+                        lp = new LogPanel(new PegaSource((PegaHost) host), logFile.getBlockPattern());
+                    } else if (host instanceof SocketHubHost) {
+                        lp = new LogPanel(new SocketHubClientSource(host), SocketHubClientSource.BLOCK_PATTERN);
                     }
                     createTab(lp, host.getDescription() + " : " + logFile.getName());
                     new FileDrop(System.out, lp.getViewport().getView(), new FileDrop.Listener() {
@@ -220,7 +224,7 @@ public class MainWindow {
                             Object[] options = {"Yes, please",
                                     "No, thanks"};
                             retry = JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(lp,
-                                    "Can't open log '" + name + "'!\n" + Utils.getFirstCause(e).getMessage() + "\nLet's try to reconnect?",
+                                    "Can't open log '" + name + "'!\n" + e.getMessage() + "\n" + Utils.getFirstCause(e).getMessage() + "\nLet's try to reconnect?",
                                     "Error",
                                     JOptionPane.YES_NO_OPTION,
                                     JOptionPane.ERROR_MESSAGE,

@@ -9,8 +9,8 @@ import ru.lanit.dibr.utils.utils.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -22,12 +22,15 @@ public class SshSource implements LogSource {
 
     private boolean isClosed = false;
     private boolean paused = false;
-    private boolean writeLineNumbers = false;
+//    private boolean writeLineNumbers = false;
     private Thread readThread;
 
-    List<String> buffer;
+    LinkedList<String> buffer;
+    private Iterator<String> descIter;
 
-    int readedLines;
+//    int readedLines;
+    String lastLine = null;
+
     private SshHost host;
     private LogFile logFile;
     BufferedReader reader = null;
@@ -41,13 +44,13 @@ public class SshSource implements LogSource {
 
     public void startRead() throws Exception {
         //checkClosed();
-        readedLines = 0;
+//        readedLines = 0;
         paused = false;
-        buffer = new ArrayList<String>();
+        buffer = new LinkedList<String>();
         session = host.connect(debugOutput);
         isClosed = false;
         channel = (ChannelExec) session.openChannel("exec");
-        channel.setCommand("tail -n 1000 -f " + logFile.getPath());
+        channel.setCommand("tail -n 2000 -f " + logFile.getPath());
         //channel.setCommand("tail -c +0 -f " + logFile.getPath()); //Так можно загрузить весь файл
         reader = new BufferedReader(new InputStreamReader(channel.getInputStream(), host.getDefaultEncoding()));
         Utils.writeToDebugQueue(debugOutput, "Starting tailing '" + logFile.getName() + "' for host '" + host.getDescription() + "'..");
@@ -60,8 +63,10 @@ public class SshSource implements LogSource {
                 String nextLine;
                 try {
                     while ((nextLine = reader.readLine()) != null && !isClosed) {
-//                        buffer.add(String.format("%6d: %s", (buffer.size()+1), nextLine));
-                        buffer.add(nextLine);
+                        buffer.add(0, nextLine);
+                        if(buffer.size()> MAX_CACHED_LINES && buffer.getLast()!=lastLine ) {
+                            buffer.removeLast();
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -109,6 +114,7 @@ public class SshSource implements LogSource {
 //
 //            }
 //        }, "Connection monitor").start();
+
         readThread.start();
 
     }
@@ -123,25 +129,37 @@ public class SshSource implements LogSource {
             if(isClosed) {
                 throw new IOException("Connection lost.");
             }
-            if (buffer.size() > readedLines) {
-                if(writeLineNumbers) {
-                    return String.format("%6d: %s", readedLines + 1, buffer.get(readedLines++));
+//            if (buffer.size() > readedLines) {
+            int idx;
+            if(descIter!=null) {
+                if(descIter.hasNext()) {
+                    lastLine = descIter.next();
                 } else {
-                    return buffer.get(readedLines++);
+                    descIter = null;
+                }
+            } else if (!buffer.isEmpty()) {
+                if (lastLine==null) {
+                    descIter = buffer.descendingIterator();
+                    lastLine = descIter.next();
+                } else if ((idx=buffer.indexOf(lastLine))!=0) {
+                    lastLine = buffer.get(idx-1);
+                } else {
+                    Thread.sleep(10);
+                    return LogSource.SingletonSkipLineValue.SKIP_LINE;
                 }
             } else {
                 Thread.sleep(10);
+                return LogSource.SingletonSkipLineValue.SKIP_LINE;
             }
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return LogSource.SingletonSkipLineValue.SKIP_LINE;
+        return lastLine;
     }
 
     /** сбрасывает счётчик прочитанных строк на 0. Следующий вызов readLine() вернёт первую строку из буффера. */
     public void reset() {
-        readedLines = 0;
+        lastLine = null;
         //reader.reset();
     }
 
@@ -173,7 +191,7 @@ public class SshSource implements LogSource {
             System.out.println("try to disconnect SSH channel:");
             try {
                 System.out.println("Sending KILL signal.");
-                channel.sendSignal("KILL");
+            channel.sendSignal("KILL");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -203,11 +221,11 @@ public class SshSource implements LogSource {
     }
 
     public boolean isWriteLineNumbers() {
-        return writeLineNumbers;
+        return false;
     }
 
     public void setWriteLineNumbers(boolean writeLineNumbers) {
-        this.writeLineNumbers = writeLineNumbers;
+//        this.writeLineNumbers = writeLineNumbers;
     }
 
     public boolean isPaused() {

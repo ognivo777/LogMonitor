@@ -27,6 +27,8 @@ import java.util.regex.PatternSyntaxException;
  * Time: 15:56:23
  */
 public class LogPanel extends JScrollPane implements KeyListener, CaretListener, MouseListener {
+    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(JScrollPane.class);
+
     private LogSource logSource;
     private Source filtersChain;
     private String blockPattern;
@@ -51,6 +53,8 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
 
     final Highlighter hilit;
     final Highlighter.HighlightPainter painter;
+
+    private int linesCount = 0;
 
     AtomicBoolean mouseClickedOnScrollBar = new AtomicBoolean(false);
 
@@ -219,6 +223,22 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
             @Override
             public void run() {
                 int pos = area.getText().length()-1;
+                linesCount += (nextLine.split("\n").length + 1);
+                if(linesCount >= logSource.MAX_CACHED_LINES) {
+                    int i = 0;
+                    int j = 0;
+                    for (; j < 100; j++) {
+                        i = area.getText().indexOf("\n", i + 1);
+                        if(i<0) {
+                            break;
+                        }
+                    }
+                    if(i > 1) {
+                        log.info("Crop upper lines: " + j + ". (up to pos: " + i + ")");
+                        linesCount-=j;
+                        area.replaceRange("", 0, i + 1);
+                    }
+                }
                 area.append("\n" + nextLine);
                 if(find!=null && find.length()>0) {
                     highlightFromCursor(hilit, painter, pos);
@@ -241,7 +261,8 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                area.setText("");
+                clearView();
+//                area.setText("");
             }
         });
         try {
@@ -250,6 +271,11 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
             System.out.println("Can't close log source:");
             e.printStackTrace();
         }
+    }
+
+    private void clearView() {
+        area.replaceRange("",0,area.getText().length());
+        linesCount = 0;
     }
 
     public boolean isClosed() {
@@ -299,7 +325,9 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
                 }
             } else if ((ke.getKeyCode() == KeyEvent.VK_N)) { //Нажали N - номера строк
                 logSource.setPaused(true);
-                area.setText("");
+//                area.setText("");
+//                linesCount = 0;
+                clearView();
                 setAutoScroll(true);
                 logSource.setWriteLineNumbers(!logSource.isWriteLineNumbers());
                 logSource.reset();
@@ -308,7 +336,8 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
                 new HotKeysInfo();
             } else if (ke.getKeyCode() == KeyEvent.VK_C) { // Key 'C'
                 logSource.setPaused(true);
-                area.setText("");
+//                area.setText("");
+                clearView();
                 logSource.setPaused(false);
             }
         }
@@ -390,7 +419,8 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
     public void resetFilters() {
         logSource.setPaused(true);
         filtersChain = logSource;
-        area.setText("");
+//        area.setText("");
+        clearView();
         if (blockInvertedFilter.isActive()) {
             filtersChain = blockInvertedFilter.apply(filtersChain);
         }

@@ -60,6 +60,9 @@ public abstract class AbstractHost {
         this.proxyPasswd = proxyPasswd;
     }
 
+    protected AbstractHost() {
+    }
+
     public String getDescription() {
         return description;
     }

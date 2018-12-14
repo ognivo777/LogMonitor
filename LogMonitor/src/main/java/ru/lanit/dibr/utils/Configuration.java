@@ -78,7 +78,10 @@ public class Configuration {
                     if (logList.item(j).getNodeName().equals("log")) {
                         NamedNodeMap logElement = logList.item(j).getAttributes();
                         String name = logElement.getNamedItem("name").getNodeValue();
-                        String file = logElement.getNamedItem("file").getNodeValue();
+                        String file = null;
+                        if (logElement.getNamedItem("file") != null) {
+                            file = logElement.getNamedItem("file").getNodeValue();
+                        }
                         String blockPattern = null;
                         if (logElement.getNamedItem("blockPattern") != null) {
                             blockPattern = logElement.getNamedItem("blockPattern").getNodeValue().trim();
@@ -100,57 +103,35 @@ public class Configuration {
     }
 
     private AbstractHost readHost(Node server) {
-        String descr = server.getAttributes().getNamedItem("name").getNodeValue();
-        String host = server.getAttributes().getNamedItem("host").getNodeValue();
-        String port = null;
-        if (server.getAttributes().getNamedItem("port") != null) {
-            port = server.getAttributes().getNamedItem("port").getNodeValue();
-        }
-        String user = server.getAttributes().getNamedItem("user").getNodeValue();
-        String password = null;
-        if (server.getAttributes().getNamedItem("password") != null) {
-            password = server.getAttributes().getNamedItem("password").getNodeValue();
-        }
-
-        String encoding = null;
-        if (server.getAttributes().getNamedItem("encoding") != null) {
-            encoding = server.getAttributes().getNamedItem("encoding").getNodeValue();
-        }
+        String descr = getAttr(server,"name");
+        String host = getAttr(server,"host");
+        String port = getAttr(server,"port");
+        String user = getAttr(server, "user");
+        String password = getAttr(server, "password");
+        String encoding = getAttr(server,"encoding");
         if (encoding == null || encoding.trim().length() == 0) {
             encoding = System.getProperty("file.encoding");
         }
 
-        String proxyHost = null;
+        String proxyHost = getAttr(server,"proxyHost");
         String proxyLogin = null;
         String proxyPasswd = null;
         String proxyType = null;
         String proxyPort = null;
-        if (server.getAttributes().getNamedItem("proxyHost") != null) {
-            proxyHost = server.getAttributes().getNamedItem("proxyHost").getNodeValue();
-            if (server.getAttributes().getNamedItem("proxyType") != null) {
-                proxyType = server.getAttributes().getNamedItem("proxyType").getNodeValue();
-            }
-            if (server.getAttributes().getNamedItem("proxyPort") != null) {
-                proxyPort = server.getAttributes().getNamedItem("proxyPort").getNodeValue();
-            }
-            if (server.getAttributes().getNamedItem("proxyLogin") != null) {
-                proxyLogin = server.getAttributes().getNamedItem("proxyLogin").getNodeValue();
-            }
-            if (server.getAttributes().getNamedItem("proxyPasswd") != null) {
-                proxyPasswd = server.getAttributes().getNamedItem("proxyPasswd").getNodeValue();
-            }
+        if (proxyHost != null) {
+            proxyType = getAttr(server,"proxyType");
+            proxyPort = getAttr(server,"proxyPort");
+            proxyLogin = getAttr(server,"proxyLogin");
+            proxyPasswd = getAttr(server,"proxyPasswd");
         }
 
         Tunnel tunnel = null;
-        if (server.getAttributes().getNamedItem("tunnel") != null) {
-            tunnel = tunnels.get(server.getAttributes().getNamedItem("tunnel").getNodeValue());
+        String tunnelStr = getAttr(server,"tunnel");
+        if (tunnelStr != null) {
+            tunnel = tunnels.get(tunnelStr);
         }
 
-
-        String serverType = null;
-        if (server.getAttributes().getNamedItem("serverType") != null) {
-            serverType = server.getAttributes().getNamedItem("serverType").getNodeValue();
-        }
+        String serverType = getAttr(server,"serverType");
 
         AbstractHost nextHost = null;
 
@@ -159,10 +140,7 @@ public class Configuration {
                 port = "22";
             }
             //SSH specific
-            String pem = null;
-            if (server.getAttributes().getNamedItem("pem") != null) {
-                pem = server.getAttributes().getNamedItem("pem").getNodeValue();
-            }
+            String pem = getAttr(server,"pem");
 
             if (proxyHost != null) {
                 if (proxyPort == null || proxyPort.trim().length() == 0) {
@@ -215,7 +193,34 @@ public class Configuration {
                 nextHost = new CIFSHost(descr, host, Integer.parseInt(port), user, password, encoding, tunnel);
             }
 
+        } else if (serverType.equalsIgnoreCase("SHUB")) {
+            if(port ==  null || port.isEmpty()) {
+                port = "30332";
+            }
+            nextHost = new SocketHubHost(descr, host, Integer.parseInt(port));
+        } else if (serverType.equalsIgnoreCase("Pega")) {
+            if (proxyHost != null) {
+                if (proxyPort == null || proxyPort.trim().length() == 0) {
+                    proxyPort = "0";
+                }
+                if (proxyLogin == null) {
+                    nextHost = new PegaHost(descr, tunnel, host, user, password, encoding, proxyHost, Integer.parseInt(proxyPort), proxyType, null, null);
+                } else {
+                    nextHost = new PegaHost(descr, tunnel, host, user, password, encoding, proxyHost, Integer.parseInt(proxyPort), proxyType, proxyLogin, proxyPasswd);
+                }
+
+            } else {
+                nextHost = new PegaHost(descr, host, user, password, encoding, tunnel);
+            }
+
         }
         return nextHost;
+    }
+
+    private static String getAttr(Node node, String attrName) {
+        if (node.getAttributes().getNamedItem(attrName) != null) {
+            return node.getAttributes().getNamedItem(attrName).getNodeValue();
+        }
+        return null;
     }
 }

@@ -10,6 +10,8 @@ import java.io.InputStream;
  * Time: 2:08
  */
 public interface Source {
+    public static int MAX_CACHED_LINES = 15555;
+
     public String readLine() throws IOException;
     public void reset();
     public void close() throws Exception;

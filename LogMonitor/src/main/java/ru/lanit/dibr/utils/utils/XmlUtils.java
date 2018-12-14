@@ -26,9 +26,15 @@ public class XmlUtils {
         }
 
         public synchronized String format(String s, int initialIndent) {
+            int xmlStarts = s.indexOf("<");
+            if (xmlStarts<0) {
+                return s;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append(s.subSequence(0, xmlStarts));
+            s = s.substring(xmlStarts, s.length());
             s =  s.replaceAll(">\\s+<", "><");
             int indent = initialIndent;
-            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < s.length(); i++) {
                 char currentChar = s.charAt(i);
                 if (currentChar == '<') {

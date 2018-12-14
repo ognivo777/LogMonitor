@@ -1,5 +1,6 @@
 package ru.lanit.dibr.utils.utils;
 
+import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
 //import com.jcraft.jsch.UIKeyboardInteractive;
 
@@ -11,7 +12,9 @@ import java.awt.*;
  * Date: 16.08.2010
  * Time: 16:00:38
  */
-public class MyUserInfo implements UserInfo {
+public class MyUserInfo implements UserInfo
+		, UIKeyboardInteractive
+{
 
 	public MyUserInfo(String passwd) {
 		this.passwd = passwd;
@@ -48,6 +51,7 @@ public class MyUserInfo implements UserInfo {
 	}
 
 	public void showMessage(String message) {
+		System.out.println("UserInfo message:" + message);
 		JOptionPane.showMessageDialog(null, message);
 	}
 
@@ -58,4 +62,19 @@ public class MyUserInfo implements UserInfo {
 					new Insets(0, 0, 0, 0), 0, 0);
 	private Container panel;
 
+	@Override
+	public String[] promptKeyboardInteractive(String destination, String name, String instruction, String[] prompt, boolean[] echo) {
+		String result[] = new String[prompt.length];
+		for (int i = 0 ; i<prompt.length; i++) {
+			String s = prompt[i];
+			System.out.println("Server prompt: " + s);
+			if(s.contains("assword")) {
+				System.out.println("Putting stored password as an answer.");
+				result[i] = passwd;
+			} else {
+				result[i] = "";
+			}
+		}
+		return result;
+	}
 }
