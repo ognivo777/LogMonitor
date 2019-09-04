@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/LogMonitor.iml" filepath="$PROJECT_DIR$/LogMonitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LogMonitor.iml" filepath="$PROJECT_DIR$/LogMonitor.iml" group="LogMonitor" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/LogMonitor_main.iml" filepath="$PROJECT_DIR$/.idea/modules/LogMonitor_main.iml" group="LogMonitor" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/LogMonitor_test.iml" filepath="$PROJECT_DIR$/.idea/modules/LogMonitor_test.iml" group="LogMonitor" />
     </modules>

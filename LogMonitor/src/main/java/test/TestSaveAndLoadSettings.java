@@ -1,6 +1,6 @@
 package test;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 import ru.lanit.dibr.utils.CmdLineConfiguration;
 import ru.lanit.dibr.utils.gui.FilterEntry;
