@@ -50,7 +50,7 @@ public class SshSource implements LogSource {
         session = host.connect(debugOutput);
         isClosed = false;
         channel = (ChannelExec) session.openChannel("exec");
-        channel.setCommand("tail -n 2000 -f " + logFile.getPath());
+        channel.setCommand("tail -n 2000 -F " + logFile.getPath());
         //channel.setCommand("tail -c +0 -f " + logFile.getPath()); //Так можно загрузить весь файл
         reader = new BufferedReader(new InputStreamReader(channel.getInputStream(), host.getDefaultEncoding()));
         Utils.writeToDebugQueue(debugOutput, "Starting tailing '" + logFile.getName() + "' for host '" + host.getDescription() + "'..");
