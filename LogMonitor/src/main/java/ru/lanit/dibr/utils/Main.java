@@ -16,31 +16,28 @@ import java.text.NumberFormat;
  */
 public class Main {
 
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ru.lanit.dibr.utils.Main.class);
+    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Main.class);
 
     public final static String VERSION = "3.21";
 
 	public static void main(String[] args) {
 
-        //log.info("teeeest");
+        log.info("LogMonitor " + VERSION + " starts.");
         JSch.setLogger(new JschLogger());
 
         log.info("java.home:" + System.getProperties().getProperty("java.home"));
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(5000);
-                        printResourceUsage();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        break;
-                    }
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(5000);
+                    printResourceUsage();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
                 }
-
             }
+
         }, "resource usage monitor").start();
 
         CmdLineParser parser = new CmdLineParser(new CmdLineConfiguration());

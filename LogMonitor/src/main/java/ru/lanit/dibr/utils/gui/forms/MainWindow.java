@@ -76,34 +76,31 @@ public class MainWindow {
             //hostPane.add(hostLabel);
 
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        while (true) {
-                            boolean tunnelAlive = false;
-                            if (tunnel != null) {
-                                if (tunnel.checkConnection()) {
-                                    hostLabelPrefix.setForeground(new Color(0x00B32D));
-                                    tunnelAlive = true;
-                                } else {
-                                    hostLabelPrefix.setForeground(new Color(0xF53D00));
-                                }
-                            }
-                            if (tunnel == null || tunnelAlive) {
-                                if (entry.getKey().checkCnnection()) {
-                                    hostLabel.setForeground(new Color(0x00B32D));
-                                } else {
-                                    hostLabel.setForeground(new Color(0xF53D00));
-                                }
+            new Thread(() -> {
+                try {
+                    while (true) {
+                        boolean tunnelAlive = false;
+                        if (tunnel != null) {
+                            if (tunnel.checkConnection()) {
+                                hostLabelPrefix.setForeground(new Color(0x00B32D));
+                                tunnelAlive = true;
                             } else {
-                                hostLabel.setForeground(Color.BLACK);
+                                hostLabelPrefix.setForeground(new Color(0xF53D00));
                             }
-                            Thread.sleep(1500);
                         }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        if (tunnel == null || tunnelAlive) {
+                            if (entry.getKey().checkCnnection()) {
+                                hostLabel.setForeground(new Color(0x00B32D));
+                            } else {
+                                hostLabel.setForeground(new Color(0xF53D00));
+                            }
+                        } else {
+                            hostLabel.setForeground(Color.BLACK);
+                        }
+                        Thread.sleep(1500);
                     }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             })
 //                    .start()

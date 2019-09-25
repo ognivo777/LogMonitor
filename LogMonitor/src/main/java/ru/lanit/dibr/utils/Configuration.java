@@ -1,5 +1,6 @@
 package ru.lanit.dibr.utils;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -9,6 +10,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+import java.nio.file.*;
 import java.util.*;
 import java.io.IOException;
 import java.io.File;
@@ -22,6 +24,8 @@ import ru.lanit.dibr.utils.gui.configuration.*;
  * Time: 22:07:28
  */
 public class Configuration {
+
+    private static Logger log = Logger.getLogger(Configuration.class);
 
     private Map<AbstractHost, LinkedHashMap<String, LogFile>> servers;
     private Map<String, Tunnel> tunnels = new HashMap<String, Tunnel>();
@@ -37,10 +41,22 @@ public class Configuration {
     public Configuration(String path) {
         try {
 
-            servers = new LinkedHashMap<AbstractHost, LinkedHashMap<String, LogFile>>();
+            log.info("Try to find configuration at '" + path + "'...");
+            File configFile = new File(path);
+
+            if(!configFile.exists()) {
+                log.warn("File not found. Stub will be created.");
+                //ToDo: create default config
+                boolean newConfigCreated = configFile.createNewFile();
+                if(newConfigCreated) {
+                    Files.write(Paths.get(configFile.getAbsolutePath()), "<settings>\n\t\n</settings>".getBytes());
+                }
+            }
+
+            servers = new LinkedHashMap<>();
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(new File(path));
+            Document doc = db.parse(configFile);
 
             NodeList tunnelsList = doc.getElementsByTagName("tunnel");
             for (int i = 0; i < tunnelsList.getLength(); i++) {
