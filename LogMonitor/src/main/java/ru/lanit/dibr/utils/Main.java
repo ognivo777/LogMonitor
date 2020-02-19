@@ -18,7 +18,7 @@ public class Main {
 
     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Main.class);
 
-    public final static String VERSION = "3.23";
+    public final static String VERSION = "3.24";
 
 	public static void main(String[] args) {
 
