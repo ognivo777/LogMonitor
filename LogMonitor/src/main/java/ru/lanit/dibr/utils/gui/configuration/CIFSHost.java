@@ -6,6 +6,9 @@ import ru.lanit.dibr.utils.core.AbstractHost;
  * Created by Vova on 17.02.2016.
  */
 public class CIFSHost extends AbstractHost {
+
+    private String domain;
+
     public CIFSHost(String description, String host, int port, String user, String password, String defaultEncoding, Tunnel tunnel) {
         super(description, host, port, user, password, defaultEncoding, tunnel);
     }
@@ -22,5 +25,13 @@ public class CIFSHost extends AbstractHost {
     @Override
     public String saveFullFilePlain(LogFile logFile) {
         return null;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 }

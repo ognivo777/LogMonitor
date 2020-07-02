@@ -27,7 +27,7 @@ public class CIFSSource implements LogSource {
     List<String> buffer;
 
     int readedLines;
-    private AbstractHost host;
+    private CIFSHost host;
     private LogFile logFile;
     BufferedReader reader = null;
     SmbFile smbFile;
@@ -51,12 +51,18 @@ public class CIFSSource implements LogSource {
 //                smbUrl += host.getUser() + ":" + host.getPassword() + "@";
 //
 //            }
-            smbUrl += host.getHost() + ":" + host.getPort() + "/" + logFile.getPath();
+            smbUrl += host.getHost();
+
+            if( host.getPort() != 0) {
+                smbUrl +=  ":" + host.getPort();
+            }
+
+            smbUrl+= "/" + logFile.getPath();
 
             System.out.println("smbUrl = " + smbUrl);
 
             if(host.getUser() != null && !host.getUser().isEmpty()) {
-                NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(null, host.getUser(), host.getPassword());
+                NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(host.getDomain(), host.getUser(), host.getPassword());
                 smbFile = new SmbFile(smbUrl, auth);
             } else {
                 smbFile = new SmbFile(smbUrl);

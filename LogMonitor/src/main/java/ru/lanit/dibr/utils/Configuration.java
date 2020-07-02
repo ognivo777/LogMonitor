@@ -122,6 +122,7 @@ public class Configuration {
         String descr = getAttr(server,"name");
         String host = getAttr(server,"host");
         String port = getAttr(server,"port");
+        String domain = getAttr(server, "domain");
         String user = getAttr(server, "user");
         String password = getAttr(server, "password");
         String encoding = getAttr(server,"encoding");
@@ -191,8 +192,9 @@ public class Configuration {
             }
 
         } else if (serverType.equalsIgnoreCase("SMB")) {
+            CIFSHost cifsHost;
             if(port ==  null || port.isEmpty()) {
-                port = "445";
+                port = "0";
             }
 
             if (proxyHost != null) {
@@ -200,14 +202,20 @@ public class Configuration {
                     proxyPort = "0";
                 }
                 if (proxyLogin == null) {
-                    nextHost = new CIFSHost(descr, tunnel, host, Integer.parseInt(port), user, password, encoding, proxyHost, Integer.parseInt(proxyPort), proxyType, null, null);
+                    cifsHost = new CIFSHost(descr, tunnel, host, Integer.parseInt(port), user, password, encoding, proxyHost, Integer.parseInt(proxyPort), proxyType, null, null);
                 } else {
-                    nextHost = new CIFSHost(descr, tunnel, host, Integer.parseInt(port), user, password, encoding, proxyHost, Integer.parseInt(proxyPort), proxyType, proxyLogin, proxyPasswd);
+                    cifsHost = new CIFSHost(descr, tunnel, host, Integer.parseInt(port), user, password, encoding, proxyHost, Integer.parseInt(proxyPort), proxyType, proxyLogin, proxyPasswd);
                 }
 
             } else {
-                nextHost = new CIFSHost(descr, host, Integer.parseInt(port), user, password, encoding, tunnel);
+                cifsHost = new CIFSHost(descr, host, Integer.parseInt(port), user, password, encoding, tunnel);
             }
+
+            cifsHost.setDomain(domain);
+
+            nextHost = cifsHost;
+
+
 
         } else if (serverType.equalsIgnoreCase("File")) {
                 nextHost = new CIFSHost(descr, host, Integer.parseInt(port), user, password, encoding, tunnel);
