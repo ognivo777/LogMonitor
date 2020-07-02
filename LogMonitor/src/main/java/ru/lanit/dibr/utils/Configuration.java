@@ -209,6 +209,9 @@ public class Configuration {
                 nextHost = new CIFSHost(descr, host, Integer.parseInt(port), user, password, encoding, tunnel);
             }
 
+        } else if (serverType.equalsIgnoreCase("File")) {
+                nextHost = new CIFSHost(descr, host, Integer.parseInt(port), user, password, encoding, tunnel);
+
         } else if (serverType.equalsIgnoreCase("SHUB")) {
             if(port ==  null || port.isEmpty()) {
                 port = "30332";

@@ -1,5 +1,6 @@
 package ru.lanit.dibr.utils.core;
 
+import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
@@ -45,17 +46,24 @@ public class CIFSSource implements LogSource {
             buffer = new ArrayList<String>();
 
             String smbUrl = "smb://";
-            if(host.getUser() != null && !host.getUser().isEmpty()) {
-                smbUrl += host.getUser() + ":" + host.getPassword() + "@";
 
-            }
-
+//            if(host.getUser() != null && !host.getUser().isEmpty()) {
+//                smbUrl += host.getUser() + ":" + host.getPassword() + "@";
+//
+//            }
             smbUrl += host.getHost() + ":" + host.getPort() + "/" + logFile.getPath();
 
             System.out.println("smbUrl = " + smbUrl);
 
-            smbFile = new SmbFile(smbUrl);
+            if(host.getUser() != null && !host.getUser().isEmpty()) {
+                NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(null, host.getUser(), host.getPassword());
+                smbFile = new SmbFile(smbUrl, auth);
+            } else {
+                smbFile = new SmbFile(smbUrl);
+            }
+
             smbFile.connect();
+
             System.out.println("Exist: " + smbFile.exists());
             System.out.println("canRead: " + smbFile.canRead());
             System.out.println("FileSize: " + smbFile.getContentLength());
