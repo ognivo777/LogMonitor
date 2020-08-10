@@ -39,7 +39,5 @@ public class TestReadLog {
 //		writer.newLine();
 		writer.flush();
 		Thread.sleep(10000);
-
-
 	}
 }

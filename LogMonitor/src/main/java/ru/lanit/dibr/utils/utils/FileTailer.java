@@ -25,7 +25,6 @@ public class FileTailer {
         if(!(_file.exists()&&_file.canRead())) {
             //todo error
         }
-
     }
 
     public String readLine() throws InterruptedException {

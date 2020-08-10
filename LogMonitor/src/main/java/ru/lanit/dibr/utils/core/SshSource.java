@@ -9,44 +9,27 @@ import ru.lanit.dibr.utils.utils.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * User: Vova
  * Date: 13.11.12
  * Time: 2:12
  */
-public class SshSource implements LogSource {
+public class SshSource extends AbstractCachedLogSource {
 
-    private boolean isClosed = false;
-    private boolean paused = false;
-//    private boolean writeLineNumbers = false;
     private Thread readThread;
-
-    LinkedList<String> buffer;
-    private Iterator<String> descIter;
-
-//    int readedLines;
-    String lastLine = null;
-
     private SshHost host;
-    private LogFile logFile;
+
     BufferedReader reader = null;
     ChannelExec channel = null;
     Session session = null;
 
     public SshSource(SshHost host, LogFile logFile) {
+        super(logFile);
         this.host = host;
-        this.logFile = logFile;
     }
 
     public void startRead() throws Exception {
-        //checkClosed();
-//        readedLines = 0;
-        paused = false;
-        buffer = new LinkedList<String>();
         session = host.connect(debugOutput);
         isClosed = false;
         channel = (ChannelExec) session.openChannel("exec");
@@ -63,12 +46,15 @@ public class SshSource implements LogSource {
                 String nextLine;
                 try {
                     while ((nextLine = reader.readLine()) != null && !isClosed) {
-                        buffer.add(0, nextLine);
-                        if(buffer.size()> MAX_CACHED_LINES && buffer.getLast()!=lastLine ) {
-                            buffer.removeLast();
+                        synchronized (buffer) {
+                            buffer.add(0, nextLine);
+                            if (buffer.size() > MAX_CACHED_LINES && buffer.getLast() != lastLine) {
+                                buffer.removeLast();
+                            }
                         }
                     }
                 } catch (IOException e) {
+                    //todo перехватить и в дебаг отправить, использовать логгеры
                     e.printStackTrace();
                     try {
                         close();
@@ -80,87 +66,7 @@ public class SshSource implements LogSource {
                 System.out.println("Stopped SSH read thread.");
             }
         }, "SSH2BufferReader");
-
-        // Запуск треда, который мониторит состояние соединения
-//        new Thread(new Runnable() {
-//            public void run() {
-//                while(channel.isConnected() && !isClosed && (host.getTunnel()==null || host.getTunnel().isConnectionAlive())) {
-//                    try {
-//                        if(host.getTunnel()!=null) {
-//                            if(!host.getTunnel().isConnectionAlive()) {
-//                                System.out.println("Tunnel are disconnected!");
-//                                close();
-//                                break;
-//                            }
-//                        }
-//                        Thread.sleep(1500);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//                if(!isClosed) {
-//                    System.out.println("Connection failed!");
-//                    readThread.interrupt();
-//                    try {
-//                        close();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    System.out.println("Stopped SSH connection monitor thread.");
-//                }
-//
-//            }
-//        }, "Connection monitor").start();
-
         readThread.start();
-
-    }
-
-    /** возвращает очередную строку, либо константу "EMPTY_LINE". Если SSHSourсе поставлен на паузу - просто висит ожидая снятия паузы */
-    public String readLine() throws IOException {
-        try {
-            while (paused && !isClosed) {
-                System.out.println("I'm asleep..");
-                Thread.sleep(10);
-            }
-            if(isClosed) {
-                throw new IOException("Connection lost.");
-            }
-//            if (buffer.size() > readedLines) {
-            int idx;
-            if(descIter!=null) {
-                if(descIter.hasNext()) {
-                    lastLine = descIter.next();
-                } else {
-                    descIter = null;
-                }
-            } else if (!buffer.isEmpty()) {
-                if (lastLine==null) {
-                    descIter = buffer.descendingIterator();
-                    lastLine = descIter.next();
-                } else if ((idx=buffer.indexOf(lastLine))!=0) {
-                    lastLine = buffer.get(idx-1);
-                } else {
-                    Thread.sleep(10);
-                    return LogSource.SingletonSkipLineValue.SKIP_LINE;
-                }
-            } else {
-                Thread.sleep(10);
-                return LogSource.SingletonSkipLineValue.SKIP_LINE;
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return lastLine;
-    }
-
-    /** сбрасывает счётчик прочитанных строк на 0. Следующий вызов readLine() вернёт первую строку из буффера. */
-    public void reset() {
-        lastLine = null;
-        //reader.reset();
     }
 
     /** загружает в буффер целиком весь файл с сервера. На данный момент не используется */
@@ -171,7 +77,7 @@ public class SshSource implements LogSource {
         }
     }
 
-    public void close() throws Exception {
+    public void close() {
         if(isClosed) {
             System.out.println("SSH source already closed!");
             return;
@@ -215,11 +121,6 @@ public class SshSource implements LogSource {
         buffer.clear();
     }
 
-    public void setPaused(boolean paused) {
-        System.out.println("set paused: " + paused);
-        this.paused = paused;
-    }
-
     public boolean isWriteLineNumbers() {
         return false;
     }
@@ -228,18 +129,8 @@ public class SshSource implements LogSource {
 //        this.writeLineNumbers = writeLineNumbers;
     }
 
-    public boolean isPaused() {
-        return paused;
-    }
-
     @Override
     public String getName() {
         return host.getHost()+logFile.getPath()+logFile.getName();
     }
-
-    @Override
-    public BlockingQueue<String> getDebugOutput() {
-        return debugOutput;
-    }
-
 }

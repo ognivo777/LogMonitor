@@ -11,6 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public interface LogSource extends Source {
     BlockingQueue<String> debugOutput = new LinkedBlockingQueue<String>();
 
+    /** Подключение к источнику и запуск его чтения */
     public void startRead() throws Exception;
     public void reloadFull() throws Exception;
     public void close() throws Exception;

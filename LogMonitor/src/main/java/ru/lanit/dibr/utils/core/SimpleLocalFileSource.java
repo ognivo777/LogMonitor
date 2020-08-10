@@ -16,7 +16,7 @@ public class SimpleLocalFileSource implements LogSource {
     private boolean isClosed = false;
     private AtomicBoolean paused = new AtomicBoolean(false);
     SynchronousQueue<String> readQueue = new SynchronousQueue<String>();
-    private long SLEEP = 100;
+    private long SLEEP = 5;
     private boolean writeLineNumbers = false;
 
     private File fileToRead;

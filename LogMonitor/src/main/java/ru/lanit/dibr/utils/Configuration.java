@@ -122,7 +122,6 @@ public class Configuration {
         String descr = getAttr(server,"name");
         String host = getAttr(server,"host");
         String port = getAttr(server,"port");
-        String domain = getAttr(server, "domain");
         String user = getAttr(server, "user");
         String password = getAttr(server, "password");
         String encoding = getAttr(server,"encoding");
@@ -211,14 +210,41 @@ public class Configuration {
                 cifsHost = new CIFSHost(descr, host, Integer.parseInt(port), user, password, encoding, tunnel);
             }
 
+            String domain = getAttr(server, "domain");
             cifsHost.setDomain(domain);
 
             nextHost = cifsHost;
 
+        } else if (serverType.equalsIgnoreCase("SMBv2")) {
+            CIFSHostV2 cifsHost;
+            if(port ==  null || port.isEmpty()) {
+                port = "0";
+            }
 
+            if (proxyHost != null) {
+                if (proxyPort == null || proxyPort.trim().length() == 0) {
+                    proxyPort = "0";
+                }
+                if (proxyLogin == null) {
+                    cifsHost = new CIFSHostV2(descr, tunnel, host, Integer.parseInt(port), user, password, encoding, proxyHost, Integer.parseInt(proxyPort), proxyType, null, null);
+                } else {
+                    cifsHost = new CIFSHostV2(descr, tunnel, host, Integer.parseInt(port), user, password, encoding, proxyHost, Integer.parseInt(proxyPort), proxyType, proxyLogin, proxyPasswd);
+                }
+
+            } else {
+                cifsHost = new CIFSHostV2(descr, host, Integer.parseInt(port), user, password, encoding, tunnel);
+            }
+
+            String domain = getAttr(server, "domain");
+            cifsHost.setDomain(domain);
+
+            String shareName = getAttr(server, "shareName");
+            cifsHost.setShareName(shareName);
+
+            nextHost = cifsHost;
 
         } else if (serverType.equalsIgnoreCase("File")) {
-                nextHost = new CIFSHost(descr, host, Integer.parseInt(port), user, password, encoding, tunnel);
+                nextHost = new LocalSystem(descr, encoding);
 
         } else if (serverType.equalsIgnoreCase("SHUB")) {
             if(port ==  null || port.isEmpty()) {

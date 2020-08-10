@@ -9,6 +9,7 @@ import ru.lanit.dibr.utils.gui.LogPanel;
 import ru.lanit.dibr.utils.gui.MenuButton;
 import ru.lanit.dibr.utils.gui.configuration.*;
 import ru.lanit.dibr.utils.utils.FileDrop;
+import ru.lanit.dibr.utils.utils.FileTailer;
 import ru.lanit.dibr.utils.utils.Utils;
 
 import javax.swing.*;
@@ -168,10 +169,14 @@ public class MainWindow {
                         lp = new LogPanel(new FtpSource((FTPHost) host, logFile), logFile.getBlockPattern());
                     } else if (host instanceof CIFSHost) {
                         lp = new LogPanel(new CIFSSource((CIFSHost) host, logFile), logFile.getBlockPattern());
+                    } else if (host instanceof CIFSHostV2) {
+                        lp = new LogPanel(new CIFSSourceV2((CIFSHostV2) host, logFile), logFile.getBlockPattern());
                     } else if (host instanceof PegaHost) {
                         lp = new LogPanel(new PegaSource((PegaHost) host), logFile.getBlockPattern());
                     } else if (host instanceof SocketHubHost) {
                         lp = new LogPanel(new SocketHubClientSource(host), SocketHubClientSource.BLOCK_PATTERN);
+                    } else if (host instanceof LocalSystem) {
+                        lp = new LogPanel(new LocalFileSource((LocalSystem) host, logFile), logFile.getBlockPattern());
                     }
                     createTab(lp, host.getDescription() + " : " + logFile.getName());
                     new FileDrop(System.out, lp.getViewport().getView(), new FileDrop.Listener() {

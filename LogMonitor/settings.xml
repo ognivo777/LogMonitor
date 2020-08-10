@@ -31,6 +31,9 @@
         <log name="log2" file="Share/2.log"/>
     </server>
 
+    <server serverType="File" name="MyLocalLog">
+        <log name="log" file="C:\tmp\latest.log"/>
+    </server>
 
     <!-- Proxy -->
     <server name="Server1" host="example.com" user="root" port="22" proxyHost="proxy.server.com" proxyPort="3128" proxyType="HTTP" encoding="utf-8">
