@@ -4,11 +4,11 @@ import okhttp3.*;
 import ru.lanit.dibr.utils.gui.configuration.PegaHost;
 import ru.lanit.dibr.utils.utils.Utils;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
@@ -60,7 +60,7 @@ public class PegaSource implements LogSource {
         builder.cookieJar(new MyCookieJar());
         client = builder.build();
 
-        String encoded = DatatypeConverter.printBase64Binary(host.getPassword().getBytes());
+        String encoded = new String(Base64.getEncoder().encode(host.getPassword().getBytes()));
         String url = host.getHost() + "?pyStream=LogViewer" +
                 "&UserIdentifier=" + host.getUser() +
                 "&Password=" + encoded;
