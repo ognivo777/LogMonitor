@@ -37,6 +37,9 @@ dependencies {
     implementation files('libs/forms_rt.jar')
     implementation files('libs/prlogging-1.2.14_stripped.jar')
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    // https://mvnrepository.com/artifact/com.typesafe/config
+    implementation group: 'com.typesafe', name: 'config', version: '1.4.1'
+
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'

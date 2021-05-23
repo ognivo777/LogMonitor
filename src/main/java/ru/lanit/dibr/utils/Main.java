@@ -27,10 +27,11 @@ public class Main {
 
         log.info("java.home:" + System.getProperties().getProperty("java.home"));
 
+        //todo replace with Shedule at fix rate
         new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(30000);
                     printResourceUsage();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -46,8 +47,6 @@ public class Main {
             Configuration cfg = new Configuration(CmdLineConfiguration.settingsFileName);
             MainWindow mainWindow = new MainWindow(cfg);
 
-//            LogChoicer logs = new LogChoicer(cfg);
-//            logs.setVisible(true);
             JSch.setLogger(new Logger() {
                 @Override
                 public boolean isEnabled(int level) {
@@ -56,11 +55,24 @@ public class Main {
 
                 @Override
                 public void log(int level, String message) {
-                    System.out.println(level + ":" + message);
-//                    new Exception().printStackTrace();
+                    switch (level) {
+                        case Logger.DEBUG:
+                            log.debug("jsch: " + message);
+                            break;
+                        case Logger.WARN:
+                            log.warn("jsch: " + message);
+                            break;
+                        case Logger.ERROR:
+                            log.error("jsch: " + message);
+                            break;
+                        case Logger.FATAL:
+                            log.fatal("jsch: " + message);
+                            break;
+                        default:
+                            log.info("jsch: " + message);
+                    }
                 }
             });
-
         } catch (CmdLineException e) {
             e.printStackTrace();
         }
@@ -77,11 +89,10 @@ public class Main {
         long allocatedMemory = runtime.totalMemory();
         long freeMemory = runtime.freeMemory();
 
-        sb.append("free memory: " + format.format(freeMemory / 1024) + "<br/>");
-        sb.append("allocated memory: " + format.format(allocatedMemory / 1024) + "<br/>");
-        sb.append("max memory: " + format.format(maxMemory / 1024) + "<br/>");
-        sb.append("total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024) + "<br/>");
-//        System.out.println(sb);
+        sb.append("free memory: ").append(format.format(freeMemory / 1024)).append("<br/>");
+        sb.append("allocated memory: ").append(format.format(allocatedMemory / 1024)).append("<br/>");
+        sb.append("max memory: ").append(format.format(maxMemory / 1024)).append("<br/>");
+        sb.append("total free memory: ").append(format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024)).append("<br/>");
         log.info(sb);
     }
 }

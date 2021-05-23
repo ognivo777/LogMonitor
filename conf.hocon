@@ -1,0 +1,76 @@
+connections {
+  ssh0: {
+    description: "My ssh"
+    host: "host-0"
+    port: 22
+  }
+  ssh1: {
+    description: "My ssh"
+    host: "host-1"
+    port: 22
+    auth: {
+      login: "username"
+      password: "password"
+    }
+  }
+  ssh2: {
+    description: "My ssh2"
+    host: "host-2"
+    port: 22
+    auth: {
+      login: "username"
+      pem: "./user.pem"
+    }
+  }
+  ssh3: {
+    description: "My ssh"
+    host: "host-3"
+    port: 22
+    auth: {
+      login: "username"
+      password: "password"
+    }
+    over: ${connections.ssh1}
+  }
+}
+
+log-groups {
+  dev1 {
+    files: {
+      first-file: {
+        connection: ${connections.ssh1}
+        name: "stdout.log"
+        encoding: "utf-8"
+        format: ${formats.was}
+      }
+      second-file: {
+        connection: ${connections.ssh1}
+        name: "PegaRULES.log"
+        encoding: "utf-8"
+        format: ${formats.pega8}
+      }
+    }
+  }
+  dev2 {
+    files.gc-log: {
+      connection: ${connections.ssh1}
+      name: "native.out"
+      encoding: "utf-8"
+    }
+    //config.getLogGroup("dev2").getLogGroup("first").getFile("log").getName()
+    subgroups."first".files."log".name: "local-error.log"
+    //config.getLogGroup("dev2").getLogGroup("first").getFile("log").getName()
+    subgroups.first.files.log2.name: "local-info.log"
+  }
+}
+
+formats {
+  was {
+    block-pattern: "\\[\\d\\d\\/\\d\\d/\\d\\d \\d\\d?:\\d\\d?:\\d\\d?:\\d{1,3}\\]"
+    timestamp-pattern: ""
+  }
+  pega8 {
+    block-pattern: "\\[\\d\\d\\/\\d\\d/\\d\\d \\d\\d?:\\d\\d?:\\d\\d?:\\d{1,3}\\]"
+    timestamp-pattern: ""
+  }
+}

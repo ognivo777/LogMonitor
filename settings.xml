@@ -10,7 +10,6 @@
         <log name="Log" file="/var/myLog.log"/>
     </server>
 
-
     <!-- Simple connect -->
     <server name="Simple SSH Server" host="example.com" user="andrew" port="22" password="123" encoding="utf-8">
         <log name="Log" file="/var/myLog.log"/>

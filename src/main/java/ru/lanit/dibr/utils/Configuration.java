@@ -6,17 +6,17 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import java.nio.file.*;
-import java.util.*;
-import java.io.IOException;
-import java.io.File;
-
 import ru.lanit.dibr.utils.core.AbstractHost;
 import ru.lanit.dibr.utils.gui.configuration.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * User: VTaran
@@ -64,7 +64,7 @@ public class Configuration {
                 AbstractHost nextHost = readHost(item);
                 String name = item.getAttributes().getNamedItem("name").getNodeValue();
 
-                List<Portmap> portmapList = new ArrayList<Portmap>();
+                List<Portmap> portmapList = new ArrayList<>();
 
                 NodeList portmapNodeList = item.getChildNodes();
                 for (int j = 0; j < portmapNodeList.getLength(); j++) {
@@ -105,15 +105,22 @@ public class Configuration {
                                 blockPattern = null;
                             }
                         }
-                        servers.get(nextHost).put(name, new LogFile(name, file, blockPattern));
+//                        String encoding = getAttr(server,"encoding");
+                        String encoding = null;
+                        if (logElement.getNamedItem("encoding") != null) {
+                            encoding = logElement.getNamedItem("encoding").getNodeValue().trim();
+                            if (encoding.length() == 0) {
+                                encoding = null;
+                            }
+                        }
+                        if (encoding == null || encoding.trim().length() == 0) {
+                            encoding = System.getProperty("file.encoding");
+                        }
+                        servers.get(nextHost).put(name, new LogFile(name, file, blockPattern, encoding));
                     }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (SAXException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (ParserConfigurationException e) {
+        } catch (IOException | SAXException | ParserConfigurationException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
@@ -244,7 +251,7 @@ public class Configuration {
             nextHost = cifsHost;
 
         } else if (serverType.equalsIgnoreCase("File")) {
-                nextHost = new LocalSystem(descr, encoding);
+            nextHost = new LocalSystem(descr, encoding);
 
         } else if (serverType.equalsIgnoreCase("SHUB")) {
             if(port ==  null || port.isEmpty()) {
