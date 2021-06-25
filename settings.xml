@@ -1,5 +1,10 @@
 <settings>
 
+    <!-- Custom colors -->
+    <theme>
+        <colors background="212835" backgroundSelected="3E4451" text="e9b684" textSelected="e9b684"/>
+    </theme>
+
     <!-- SSH tunnel defenition-->
     <tunnel name="SSHTUN" host="123.123.123.123" user="guest" password="pass" port="22">
         <L localPort="30022" destHost="122.168.1.15" destPort="22" />

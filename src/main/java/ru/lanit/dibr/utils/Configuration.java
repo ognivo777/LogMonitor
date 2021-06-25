@@ -10,12 +10,15 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
 import java.nio.file.*;
 import java.util.*;
 import java.io.IOException;
 import java.io.File;
+import java.util.List;
 
 import ru.lanit.dibr.utils.core.AbstractHost;
+import ru.lanit.dibr.utils.core.Theme;
 import ru.lanit.dibr.utils.gui.configuration.*;
 
 /**
@@ -33,6 +36,8 @@ public class Configuration {
     public Map<AbstractHost, LinkedHashMap<String, LogFile>> getServers() {
         return servers;
     }
+
+    public Theme theme = new Theme();
 
     public void setServers(Map<AbstractHost, LinkedHashMap<String, LogFile>> servers) {
         this.servers = servers;
@@ -106,6 +111,22 @@ public class Configuration {
                             }
                         }
                         servers.get(nextHost).put(name, new LogFile(name, file, blockPattern));
+                    }
+                }
+            }
+
+            NodeList themeList = doc.getElementsByTagName("theme");
+            for (int i = 0; i < themeList.getLength(); i++) {
+                Node theme = themeList.item(i);
+
+                NodeList themeItemsList = theme.getChildNodes();
+                for (int j = 0; j < themeItemsList.getLength(); j++) {
+                    if (themeItemsList.item(j).getNodeName().equals("colors")) {
+                        NamedNodeMap themeItem = themeItemsList.item(j).getAttributes();
+                        this.theme.backgroundColor = new Color(Integer.parseInt(themeItem.getNamedItem("background").getNodeValue(), 16));
+                        this.theme.backgroundSelectedColor = new Color(Integer.parseInt(themeItem.getNamedItem("backgroundSelected").getNodeValue(), 16));
+                        this.theme.textColor = new Color(Integer.parseInt(themeItem.getNamedItem("text").getNodeValue(), 16));
+                        this.theme.textSelectedColor = new Color(Integer.parseInt(themeItem.getNamedItem("textSelected").getNodeValue(), 16));
                     }
                 }
             }
