@@ -2,7 +2,7 @@
 
     <!-- Custom colors -->
     <theme>
-        <colors background="212835" backgroundSelected="3E4451" text="e9b684" textSelected="e9b684"/>
+        <colors background="24110b" backgroundSelected="4d5f72" text="d6cbb0" textSelected="4af733"/>
     </theme>
 
     <!-- SSH tunnel defenition-->
