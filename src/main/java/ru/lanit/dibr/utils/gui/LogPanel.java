@@ -80,7 +80,7 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
         area = ((JTextArea) getViewport().getView());
 
         area.setEditable(false);
-        area.setFont(new Font("Courier New", 1, CmdLineConfiguration.fontSize));
+        area.setFont(new Font("Courier New", 0, CmdLineConfiguration.fontSize));
 //        area.setBackground(new Color(0, 0, 0));
         area.setBackground(theme.backgroundColor);
 //        area.setForeground(new Color(187, 187, 187));
