@@ -1,8 +1,9 @@
 <settings>
 
-    <!-- Custom colors -->
+    <!-- Theme settings -->
     <theme>
         <colors background="24110b" backgroundSelected="4d5f72" text="d6cbb0" textSelected="4af733"/>
+        <font name="Courier New" style="0" size="12"/>
     </theme>
 
     <!-- SSH tunnel defenition-->

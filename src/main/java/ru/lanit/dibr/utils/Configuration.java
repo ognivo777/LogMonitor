@@ -138,6 +138,19 @@ public class Configuration {
                         if (themeItem.getNamedItem("textSelected") != null) {
                             this.theme.textSelectedColor = new Color(Integer.parseInt(themeItem.getNamedItem("textSelected").getNodeValue(), 16));
                         }
+                    } else if (themeItemsList.item(j).getNodeName().equals("font")) {
+                        NamedNodeMap themeItem = themeItemsList.item(j).getAttributes();
+                        if (themeItem.getNamedItem("name") != null) {
+                            this.theme.fontName = themeItem.getNamedItem("name").getNodeValue();
+                        }
+
+                        if (themeItem.getNamedItem("style") != null) {
+                            this.theme.fontStyle = Integer.parseInt(themeItem.getNamedItem("style").getNodeValue());
+                        }
+
+                        if (themeItem.getNamedItem("size") != null) {
+                            this.theme.fontSize = Integer.parseInt(themeItem.getNamedItem("size").getNodeValue());
+                        }
                     }
                 }
             }
