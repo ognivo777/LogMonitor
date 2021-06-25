@@ -123,10 +123,21 @@ public class Configuration {
                 for (int j = 0; j < themeItemsList.getLength(); j++) {
                     if (themeItemsList.item(j).getNodeName().equals("colors")) {
                         NamedNodeMap themeItem = themeItemsList.item(j).getAttributes();
-                        this.theme.backgroundColor = new Color(Integer.parseInt(themeItem.getNamedItem("background").getNodeValue(), 16));
-                        this.theme.backgroundSelectedColor = new Color(Integer.parseInt(themeItem.getNamedItem("backgroundSelected").getNodeValue(), 16));
-                        this.theme.textColor = new Color(Integer.parseInt(themeItem.getNamedItem("text").getNodeValue(), 16));
-                        this.theme.textSelectedColor = new Color(Integer.parseInt(themeItem.getNamedItem("textSelected").getNodeValue(), 16));
+                        if (themeItem.getNamedItem("background") != null) {
+                            this.theme.backgroundColor = new Color(Integer.parseInt(themeItem.getNamedItem("background").getNodeValue(), 16));
+                        }
+
+                        if (themeItem.getNamedItem("backgroundSelected") != null) {
+                            this.theme.backgroundSelectedColor = new Color(Integer.parseInt(themeItem.getNamedItem("backgroundSelected").getNodeValue(), 16));
+                        }
+
+                        if (themeItem.getNamedItem("text") != null) {
+                            this.theme.textColor = new Color(Integer.parseInt(themeItem.getNamedItem("text").getNodeValue(), 16));
+                        }
+
+                        if (themeItem.getNamedItem("textSelected") != null) {
+                            this.theme.textSelectedColor = new Color(Integer.parseInt(themeItem.getNamedItem("textSelected").getNodeValue(), 16));
+                        }
                     }
                 }
             }
