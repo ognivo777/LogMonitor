@@ -33,12 +33,12 @@ public class MainWindow {
     private JPanel rootPanel;
     private JTabbedPane tabbedPane1;
     private JPanel logList;
-//    private Configuration configuration;
+    private Configuration configuration;
 
     public static int logsCnt = 0;
 
     public MainWindow(Configuration cfg) {
-//        configuration = cfg;
+        configuration = cfg;
         window = new JFrame();
         window.setTitle("Log monitor " + Main.VERSION);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -164,26 +164,26 @@ public class MainWindow {
                 } else {
                     //TODO: !!! убрать хосты внутрь лог файлов! и создавать соурсы методом на файлах!
                     if (host instanceof SshHost) {
-                        lp = new LogPanel(new SshSource((SshHost) host, logFile), logFile.getBlockPattern());
+                        lp = new LogPanel(new SshSource((SshHost) host, logFile), logFile.getBlockPattern(), configuration.theme);
                     } else if (host instanceof FTPHost) {
-                        lp = new LogPanel(new FtpSource((FTPHost) host, logFile), logFile.getBlockPattern());
+                        lp = new LogPanel(new FtpSource((FTPHost) host, logFile), logFile.getBlockPattern(), configuration.theme);
                     } else if (host instanceof CIFSHost) {
-                        lp = new LogPanel(new CIFSSource((CIFSHost) host, logFile), logFile.getBlockPattern());
+                        lp = new LogPanel(new CIFSSource((CIFSHost) host, logFile), logFile.getBlockPattern(), configuration.theme);
                     } else if (host instanceof CIFSHostV2) {
-                        lp = new LogPanel(new CIFSSourceV2((CIFSHostV2) host, logFile), logFile.getBlockPattern());
+                        lp = new LogPanel(new CIFSSourceV2((CIFSHostV2) host, logFile), logFile.getBlockPattern(), configuration.theme);
                     } else if (host instanceof PegaHost) {
-                        lp = new LogPanel(new PegaSource((PegaHost) host), logFile.getBlockPattern());
+                        lp = new LogPanel(new PegaSource((PegaHost) host), logFile.getBlockPattern(), configuration.theme);
                     } else if (host instanceof SocketHubHost) {
-                        lp = new LogPanel(new SocketHubClientSource(host), SocketHubClientSource.BLOCK_PATTERN);
+                        lp = new LogPanel(new SocketHubClientSource(host), SocketHubClientSource.BLOCK_PATTERN, configuration.theme);
                     } else if (host instanceof LocalSystem) {
-                        lp = new LogPanel(new LocalFileSource((LocalSystem) host, logFile), logFile.getBlockPattern());
+                        lp = new LogPanel(new LocalFileSource((LocalSystem) host, logFile), logFile.getBlockPattern(), configuration.theme);
                     }
                     createTab(lp, host.getDescription() + " : " + logFile.getName());
                     new FileDrop(System.out, lp.getViewport().getView(), new FileDrop.Listener() {
                         @Override
                         public void filesDropped(File[] files) {
                             for (int i = 0; i < files.length; i++) {
-                                createTab(new LogPanel(new SimpleLocalFileSource(files[i].getAbsolutePath(), 0), logFile.getBlockPattern()), "[" + files[i].getName() + "]");
+                                createTab(new LogPanel(new SimpleLocalFileSource(files[i].getAbsolutePath(), 0), logFile.getBlockPattern(), configuration.theme), "[" + files[i].getName() + "]");
                             }
                         }
                     });

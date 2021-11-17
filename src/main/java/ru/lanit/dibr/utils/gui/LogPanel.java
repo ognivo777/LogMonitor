@@ -60,7 +60,11 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
 
     public Filters filtersWindow;
 
-    public LogPanel(LogSource logSource, String blockPattern) {
+    public LogPanel(LogSource logSource, String blockPattern){
+        this(logSource, blockPattern, new Theme());
+    }
+
+    public LogPanel(LogSource logSource, String blockPattern, Theme theme) {
         super(new JTextArea());
         this.logSource = logSource;
         this.blockPattern = blockPattern;
@@ -76,14 +80,14 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
         area = ((JTextArea) getViewport().getView());
 
         area.setEditable(false);
-        area.setFont(new Font("Courier New", 0, CmdLineConfiguration.fontSize));
+        area.setFont(new Font(theme.fontName, theme.fontStyle, theme.fontSize));
 //        area.setBackground(new Color(0, 0, 0));
-        area.setBackground(new Color(36, 17, 11));
+        area.setBackground(theme.backgroundColor);
 //        area.setForeground(new Color(187, 187, 187));
-        area.setForeground(new Color(214, 203, 176));
+        area.setForeground(theme.textColor);
 //        area.setSelectedTextColor(new Color(0, 0, 0));
-        area.setSelectedTextColor(new Color(74, 247, 51));
-        area.setSelectionColor(new Color(77, 95, 114));
+        area.setSelectedTextColor(theme.textSelectedColor);
+        area.setSelectionColor(theme.backgroundSelectedColor);
 //        area.setSelectionColor(new Color(187, 187, 187));
         area.addMouseListener(this);
 
