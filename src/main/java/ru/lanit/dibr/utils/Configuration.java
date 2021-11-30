@@ -10,12 +10,15 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
 import java.nio.file.*;
 import java.util.*;
 import java.io.IOException;
 import java.io.File;
+import java.util.List;
 
 import ru.lanit.dibr.utils.core.AbstractHost;
+import ru.lanit.dibr.utils.core.Theme;
 import ru.lanit.dibr.utils.gui.configuration.*;
 
 /**
