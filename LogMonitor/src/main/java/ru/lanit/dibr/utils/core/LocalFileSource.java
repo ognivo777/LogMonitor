@@ -4,14 +4,13 @@ import ru.lanit.dibr.utils.gui.configuration.LocalSystem;
 import ru.lanit.dibr.utils.gui.configuration.LogFile;
 import ru.lanit.dibr.utils.utils.Utils;
 
-import java.io.File;
-import java.io.RandomAccessFile;
+import java.io.*;
 
 public class LocalFileSource extends AbstractCachedLogSource {
 
     private LocalSystem host;
     private Runnable readThread;
-    private long LOCAL_FILE_UPDATE_INTERVAL = 50;
+    private long LOCAL_FILE_UPDATE_INTERVAL = 500;
     private File file;
     private long filePointer;
 
@@ -54,7 +53,7 @@ public class LocalFileSource extends AbstractCachedLogSource {
                             try {
                                 raf.seek(filePointer);
                                 String line = null;
-                                while ((line = raf.readLine()) != null) {
+                                while ((line = readLineFromRAF(raf, logFile.getEncoding())) != null) {
                                     buffer.add(line);
                                 }
                                 filePointer = raf.getFilePointer();
@@ -72,6 +71,38 @@ public class LocalFileSource extends AbstractCachedLogSource {
         new Thread(readThread).start();
 
     }
+
+    private String readLineFromRAF(RandomAccessFile raf, String encoding) throws IOException {
+        StringBuffer input = new StringBuffer();
+        int c = -1;
+        boolean eol = false;
+        ByteArrayOutputStream buff = new ByteArrayOutputStream();
+
+        while (!eol) {
+            switch (c = raf.read()) {
+                case -1:
+                case '\n':
+                    eol = true;
+                    break;
+                case '\r':
+                    eol = true;
+                    long cur = raf.getFilePointer();
+                    if ((raf.read()) != '\n') {
+                        raf.seek(cur);
+                    }
+                    break;
+                default:
+                    buff.write(c);
+                    break;
+            }
+        }
+        input.append(new String(buff.toByteArray(), encoding));
+        if ((c == -1) && (input.length() == 0)) {
+            return null;
+        }
+        return input.toString();
+    }
+
 
     @Override
     public void reloadFull() throws Exception {
@@ -93,8 +124,4 @@ public class LocalFileSource extends AbstractCachedLogSource {
         return false;
     }
 
-    @Override
-    public void setWriteLineNumbers(boolean writeLineNumbers) {
-
-    }
 }

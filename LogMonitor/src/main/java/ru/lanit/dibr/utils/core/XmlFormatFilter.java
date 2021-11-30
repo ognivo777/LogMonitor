@@ -22,7 +22,6 @@ public class XmlFormatFilter extends BlockSearchFilter {
     @Override
     protected String readFilteredLine(Source source) throws IOException {
         String line = super.readFilteredLine(source);
-        line = removeLineNumbers(line);
         if(line!=LogSource.SingletonSkipLineValue.SKIP_LINE) {
             Matcher m = searchXml.matcher(line);
             if(m.find()) {

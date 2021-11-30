@@ -6,8 +6,9 @@ import java.io.IOException;
  * Created by Vova on 18.12.2015.
  */
 public abstract class AbstractFilter implements Filter {
+    protected boolean isActive = true;
+
     abstract protected String readFilteredLine(Source source) throws IOException;
-    boolean isActive = true;
 
     protected void onReset() {
         isActive = true;

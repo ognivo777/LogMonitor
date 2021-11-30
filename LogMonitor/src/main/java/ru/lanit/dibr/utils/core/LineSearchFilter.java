@@ -30,7 +30,7 @@ public class LineSearchFilter extends AbstractSearchFilter {
         if ((nextLine = source.readLine()) != null && nextLine!=LogSource.SingletonSkipLineValue.SKIP_LINE) {
             boolean oneOfStringsIsFound = false;
             for (String nextString : stringsToSearch) {
-                if (oneOfStringsIsFound = removeLineNumbers(nextLine).contains(nextString)) {
+                if (oneOfStringsIsFound = nextLine.contains(nextString)) {
                     break;
                 }
             }

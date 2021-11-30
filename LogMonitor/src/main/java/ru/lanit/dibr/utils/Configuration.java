@@ -34,10 +34,6 @@ public class Configuration {
         return servers;
     }
 
-    public void setServers(Map<AbstractHost, LinkedHashMap<String, LogFile>> servers) {
-        this.servers = servers;
-    }
-
     public Configuration(String path) {
         try {
 
@@ -105,7 +101,18 @@ public class Configuration {
                                 blockPattern = null;
                             }
                         }
-                        servers.get(nextHost).put(name, new LogFile(name, file, blockPattern));
+//                        String encoding = getAttr(server,"encoding");
+                        String encoding = null;
+                        if (logElement.getNamedItem("encoding") != null) {
+                            encoding = logElement.getNamedItem("encoding").getNodeValue().trim();
+                            if (encoding.length() == 0) {
+                                encoding = null;
+                            }
+                        }
+                        if (encoding == null || encoding.trim().length() == 0) {
+                            encoding = System.getProperty("file.encoding");
+                        }
+                        servers.get(nextHost).put(name, new LogFile(name, file, blockPattern, encoding));
                     }
                 }
             }
@@ -167,7 +174,6 @@ public class Configuration {
                 } else {
                     nextHost = new SshHost(descr, host, Integer.parseInt(port), user, password, pem, encoding, proxyHost, Integer.parseInt(proxyPort), proxyType, proxyLogin, proxyPasswd, tunnel);
                 }
-
             } else {
                 nextHost = new SshHost(descr, host, Integer.parseInt(port), user, password, pem, encoding, tunnel);
             }
@@ -185,7 +191,6 @@ public class Configuration {
                 } else {
                     nextHost = new FTPHost(descr, tunnel, host, Integer.parseInt(port), user, password, encoding, proxyHost, Integer.parseInt(proxyPort), proxyType, proxyLogin, proxyPasswd);
                 }
-
             } else {
                 nextHost = new FTPHost(descr, host, Integer.parseInt(port), user, password, encoding, tunnel);
             }
@@ -244,7 +249,7 @@ public class Configuration {
             nextHost = cifsHost;
 
         } else if (serverType.equalsIgnoreCase("File")) {
-                nextHost = new LocalSystem(descr, encoding);
+            nextHost = new LocalSystem(descr, encoding);
 
         } else if (serverType.equalsIgnoreCase("SHUB")) {
             if(port ==  null || port.isEmpty()) {

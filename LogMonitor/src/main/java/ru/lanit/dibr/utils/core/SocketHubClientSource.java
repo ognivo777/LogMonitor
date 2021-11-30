@@ -234,11 +234,6 @@ public class SocketHubClientSource implements LogSource {
     }
 
     @Override
-    public void setWriteLineNumbers(boolean writeLineNumbers) {
-        //Do nothing
-    }
-
-    @Override
     public BlockingQueue<String> getDebugOutput() {
         return debugOutput;
     }

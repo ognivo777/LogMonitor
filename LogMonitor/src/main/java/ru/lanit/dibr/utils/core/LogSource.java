@@ -18,8 +18,6 @@ public interface LogSource extends Source {
     public String getName();
     public boolean isWriteLineNumbers();
 
-    public void setWriteLineNumbers(boolean writeLineNumbers);
-
     public BlockingQueue<String> getDebugOutput();
 
     final class SingletonSkipLineValue {

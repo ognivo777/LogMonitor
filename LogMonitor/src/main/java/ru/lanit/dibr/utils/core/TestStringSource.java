@@ -117,11 +117,6 @@ public class TestStringSource implements LogSource {
     }
 
     @Override
-    public void setWriteLineNumbers(boolean writeLineNumbers) {
-
-    }
-
-    @Override
     public BlockingQueue<String> getDebugOutput() {
         return debugOutput;
     }

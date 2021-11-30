@@ -143,11 +143,6 @@ public class SimpleLocalFileSource implements LogSource {
     }
 
     @Override
-    public void setWriteLineNumbers(boolean writeLineNumbers) {
-        this.writeLineNumbers = writeLineNumbers;
-    }
-
-    @Override
     public BlockingQueue<String> getDebugOutput() {
         return debugOutput;
     }

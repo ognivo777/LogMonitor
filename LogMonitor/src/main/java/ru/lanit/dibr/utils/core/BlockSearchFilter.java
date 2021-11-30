@@ -69,7 +69,7 @@ public class BlockSearchFilter extends AbstractSearchFilter {
             }
             blockBuffer.append(nextLine);
             ++blockBufferLines;
-            blockBufferToSearch.append(removeLineNumbers(nextLine));
+            blockBufferToSearch.append(nextLine);
         }
 
         boolean oneOfStringIsFound = false;
@@ -98,7 +98,7 @@ public class BlockSearchFilter extends AbstractSearchFilter {
             if(nextBlockFirstLine!=null) {
                 blockBuffer.append(nextBlockFirstLine);
                 ++blockBufferLines;
-                blockBufferToSearch.append(removeLineNumbers(nextBlockFirstLine));
+                blockBufferToSearch.append(nextBlockFirstLine);
             }
             return readFilteredLine(source);
         }
@@ -114,7 +114,7 @@ public class BlockSearchFilter extends AbstractSearchFilter {
         if(nextBlockFirstLine!=null) {
             blockBuffer.append(nextBlockFirstLine);
             ++blockBufferLines;
-            blockBufferToSearch.append(removeLineNumbers(nextBlockFirstLine));
+            blockBufferToSearch.append(nextBlockFirstLine);
         }
         foundSkipLine = false;
         return LogSource.SingletonSkipLineValue.SKIP_LINE;

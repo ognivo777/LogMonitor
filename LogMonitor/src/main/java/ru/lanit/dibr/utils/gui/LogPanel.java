@@ -38,8 +38,8 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
     private String find = null;
 
 
-    private SearchFilter grepInvertedFilter = new LineSearchFilter(true);
-    private SearchFilter grepDirectFilter = new LineSearchFilter(false);
+    private SearchFilter grepInvertedFilter;
+    private SearchFilter grepDirectFilter;
     private SearchFilter blockInvertedFilter;
     private SearchFilter blockDirectFilter;
 
@@ -82,8 +82,8 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
 //        area.setForeground(new Color(187, 187, 187));
         area.setForeground(new Color(214, 203, 176));
 //        area.setSelectedTextColor(new Color(0, 0, 0));
-        area.setSelectedTextColor(new Color(74, 247, 51));
-        area.setSelectionColor(new Color(77, 95, 114));
+        area.setSelectedTextColor(new Color(173, 232, 161));
+        area.setSelectionColor(new Color(52, 73, 91));
 //        area.setSelectionColor(new Color(187, 187, 187));
         area.addMouseListener(this);
 
@@ -219,34 +219,31 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
     }
 
     private void appendLine(final String nextLine) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                int pos = area.getText().length()-1;
-                linesCount += (nextLine.split("\n").length + 1);
-                if(linesCount >= logSource.MAX_CACHED_LINES) {
-                    int i = 0;
-                    int j = 0;
-                    for (; j < 100; j++) {
-                        i = area.getText().indexOf("\n", i + 1);
-                        if(i<0) {
-                            break;
-                        }
-                    }
-                    if(i > 1) {
-                        log.info("Crop upper lines: " + j + ". (up to pos: " + i + ")");
-                        linesCount-=j;
-                        area.replaceRange("", 0, i + 1);
+        EventQueue.invokeLater(() -> {
+            int pos = area.getText().length()-1;
+            linesCount += (nextLine.split("\n").length + 1);
+            if(linesCount >= logSource.MAX_CACHED_LINES) {
+                int i = 0;
+                int j = 0;
+                for (; j < 100; j++) {
+                    i = area.getText().indexOf("\n", i + 1);
+                    if(i<0) {
+                        break;
                     }
                 }
-                area.append("\n" + nextLine);
-                if(find!=null && find.length()>0) {
-                    highlightFromCursor(hilit, painter, pos);
+                if(i > 1) {
+                    log.info("Crop upper lines: " + j + ". (up to pos: " + i + ")");
+                    linesCount-=j;
+                    area.replaceRange("", 0, i + 1);
                 }
-                System.out.println("Get autoscroll as " + (autoScroll+ "").toUpperCase() );
-                if (autoScroll.get()) {
-                    getVerticalScrollBar().setValue(getVerticalScrollBar().getMaximum());
-                }
+            }
+            area.append("\n" + nextLine);
+            if(find!=null && find.length()>0) {
+                highlightFromCursor(hilit, painter, pos);
+            }
+            System.out.println("Get autoscroll as " + (autoScroll+ "").toUpperCase() );
+            if (autoScroll.get()) {
+                getVerticalScrollBar().setValue(getVerticalScrollBar().getMaximum());
             }
         });
     }
@@ -303,7 +300,7 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
     public void keyPressed(KeyEvent ke) {
 
         if (ke.getModifiers() == 0) {
-            if ((ke.getKeyCode() == 27)) { //Нажали PgUp
+            if ((ke.getKeyCode() == 27)) {
                 //TODO fix: tight coupling with parent Frame (LogFrame)
                 Container container = getParent();
                 while (!JFrame.class.isAssignableFrom(container.getClass())) {
@@ -323,15 +320,6 @@ public class LogPanel extends JScrollPane implements KeyListener, CaretListener,
                     System.out.println("Error while open current log snapshot in popup window.");
                     e.printStackTrace();
                 }
-            } else if ((ke.getKeyCode() == KeyEvent.VK_N)) { //Нажали N - номера строк
-                logSource.setPaused(true);
-//                area.setText("");
-//                linesCount = 0;
-                clearView();
-                setAutoScroll(true);
-                logSource.setWriteLineNumbers(!logSource.isWriteLineNumbers());
-                logSource.reset();
-                logSource.setPaused(false);
             } else if (ke.getKeyCode() == KeyEvent.VK_F1) { // F1
                 new HotKeysInfo();
             } else if (ke.getKeyCode() == KeyEvent.VK_C) { // Key 'C'

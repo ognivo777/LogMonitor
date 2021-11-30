@@ -9,6 +9,8 @@ import ru.lanit.dibr.utils.utils.Utils;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.BlockingQueue;
 
 public class SshHost extends AbstractHost{
@@ -76,13 +78,27 @@ public class SshHost extends AbstractHost{
         session.setConfig("StrictHostKeyChecking", "no"); //принимать неизвестные ключи от серверов
         //сжатие потока
         if(useCompression) {
-        session.setConfig("compression.s2c", "zlib@openssh.com,zlib,none");
-        session.setConfig("compression.c2s", "zlib@openssh.com,zlib,none");
-        session.setConfig("compression_level", "9");
+            session.setConfig("compression.s2c", "zlib@openssh.com,zlib,none");
+            session.setConfig("compression.c2s", "zlib@openssh.com,zlib,none");
+            session.setConfig("compression_level", "9");
         }
 
         if (pem != null) {
+            if(!Files.exists(Paths.get(pem))) {
+                String message = "ERROR: pem is specified as '" + pem + "', but file not found.";
+                Utils.writeToDebugQueue(debugOutput, message);
+                throw new Exception(message);
+            }
+
+            if(!Files.isReadable(Paths.get(pem))) {
+                String message = "ERROR: pem specified as '" + pem + "' is found, but can not be read.";
+                Utils.writeToDebugQueue(debugOutput, message);
+                throw new Exception(message);
+            }
+
+            session.setConfig("PreferredAuthentications", "publickey");
             jsch.addIdentity(pem);
+
         } else {
             UserInfo ui = new MyUserInfo(password);
             session.setUserInfo(ui);
